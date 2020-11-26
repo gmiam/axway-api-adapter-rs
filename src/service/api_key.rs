@@ -11,5 +11,14 @@ pub async fn get_application_id_from_api_key(session: web::Data<CassandraPool>, 
     println!("{}", now.elapsed().as_millis());
 
     HttpResponse::Ok().json(response)
+}
 
+#[get("/api/keys")]
+pub async fn get_all_application_id(session: web::Data<CassandraPool>)  -> impl Responder {
+    let now = std::time::Instant::now();
+
+    let response = requests::get_all_application_id(session).unwrap();
+    println!("{}", now.elapsed().as_millis());
+
+    HttpResponse::Ok().json(response)
 }

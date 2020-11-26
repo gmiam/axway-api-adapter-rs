@@ -8,7 +8,7 @@ mod entity;
 mod service;
 
 use crate::cassandra::connection_pool::create_cassandra_pool;
-use crate::service::api_key::get_application_id_from_api_key;
+use crate::service::api_key::{get_application_id_from_api_key, get_all_application_id};
 use actix_web::{App, HttpServer};
 
 #[actix_web::main]
@@ -26,6 +26,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .data(session.clone())
             .service(get_application_id_from_api_key)
+            .service(get_all_application_id)
     })
         .keep_alive(75)
         .bind("127.0.0.1:8280")?
