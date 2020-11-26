@@ -1,5 +1,5 @@
 #![allow(non_snake_case)]
-use super::super::helpers::string_helper::remove_quotes;
+use crate::helpers::string_helper::StringExtensions;
 
 use std::convert::TryFrom;
 
@@ -24,7 +24,7 @@ impl From<ApiKeyRawStruct> for ApiKeyStruct {
     fn from(raw_struct: ApiKeyRawStruct) -> Self {
         ApiKeyStruct {
             key: raw_struct.key,
-            application_id: remove_quotes(raw_struct.applicationId),
+            application_id: raw_struct.applicationId.remove_quotes(),
         }
     }
 }
