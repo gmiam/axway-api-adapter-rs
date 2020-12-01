@@ -2,11 +2,11 @@
 use crate::helpers::string_helper::StringExtensions;
 
 use std::convert::TryFrom;
-
 use serde::Serialize;
 use cdrs::frame::IntoBytes;
 use cdrs::types::from_cdrs::FromCDRSByName;
 use cdrs::types::prelude::*;
+use anyhow::{Result, Error};
 
 #[derive(Clone, Debug, IntoCDRSValue, TryFromRow, PartialEq)]
 pub struct ApiKeyBo {
@@ -38,5 +38,21 @@ impl TryFrom<Vec<ApiKeyDto>> for ApiKeyDto {
         } else {
             Err("More than one result for given API Key")
         }
+    }
+}
+
+pub trait Jsonify {
+    fn to_json(&self) -> Result<String>;
+}
+
+impl Jsonify for Option<Vec<ApiKeyDto>> {
+    fn to_json(&self) -> Result<String> {
+        serde_json::to_string(&self).map_err(|e| Error::from(e).context("Error while converting to Json"))
+    }
+}
+
+impl Jsonify for Option<ApiKeyDto> {
+    fn to_json(&self) -> Result<String> {
+        serde_json::to_string(&self).map_err(|e| Error::from(e).context("Error while converting to Json"))
     }
 }
