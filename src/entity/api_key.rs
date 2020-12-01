@@ -34,7 +34,7 @@ impl TryFrom<Vec<ApiKeyDto>> for ApiKeyDto {
 
     fn try_from(single_value_vec: Vec<ApiKeyDto>) -> std::result::Result<Self, &'static str> {
         if single_value_vec.len() == 1 {
-            Ok(single_value_vec.into_iter().nth(0).unwrap())
+            Ok(single_value_vec.into_iter().next().unwrap())
         } else {
             Err("More than one result for given API Key")
         }

@@ -11,7 +11,7 @@ pub async fn get_application_id_from_api_key(session: &CassandraPool, key_id: &s
     let rows = exec_request(session, cql_command)?
         .into_iter()
         .map(|it| ApiKeyBo::try_from_row(it).expect("Invalid row in result"))
-        .map(|it| ApiKeyDto::from(it))
+        .map(ApiKeyDto::from)
         .collect::<Vec<_>>();
 
     ApiKeyDto::try_from(rows).ok()
@@ -23,7 +23,7 @@ pub async fn get_all_application_id(session: &CassandraPool) -> Option<Vec<ApiKe
     let rows = exec_request(session, cql_command)?
         .into_iter()
         .map(|it| ApiKeyBo::try_from_row(it).expect("Invalid row in result"))
-        .map(|it| ApiKeyDto::from(it))
+        .map(ApiKeyDto::from)
         .collect::<Vec<ApiKeyDto>>();
     Some(rows)
 }
