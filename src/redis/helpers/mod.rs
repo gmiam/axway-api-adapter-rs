@@ -1,6 +1,6 @@
-use r2d2_redis::RedisConnectionManager;
-use r2d2_redis::redis::Commands;
 use anyhow::Result;
+use r2d2_redis::redis::Commands;
+use r2d2_redis::RedisConnectionManager;
 
 pub type R2D2Con = r2d2::PooledConnection<RedisConnectionManager>;
 pub const DEFAULT_TTL: usize = 15;

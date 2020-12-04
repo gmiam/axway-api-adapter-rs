@@ -1,12 +1,13 @@
 #![allow(non_snake_case)]
-use crate::helpers::string_helper::StringExtensions;
 
 use std::convert::TryFrom;
-use serde::Serialize;
+
 use cdrs::frame::IntoBytes;
 use cdrs::types::from_cdrs::FromCDRSByName;
 use cdrs::types::prelude::*;
-use anyhow::{Result, Error};
+use serde::Serialize;
+
+use crate::helpers::string_helper::StringExtensions;
 
 #[derive(Clone, Debug, IntoCDRSValue, TryFromRow, PartialEq)]
 pub struct ApiKeyBo {
@@ -30,29 +31,25 @@ impl From<ApiKeyBo> for ApiKeyDto {
 }
 
 impl TryFrom<Vec<ApiKeyDto>> for ApiKeyDto {
-    type Error = &'static str;
+    type Error = anyhow::Error;
 
-    fn try_from(single_value_vec: Vec<ApiKeyDto>) -> std::result::Result<Self, &'static str> {
+    fn try_from(single_value_vec: Vec<ApiKeyDto>) -> anyhow::Result<Self> {
         if single_value_vec.len() == 1 {
             Ok(single_value_vec.into_iter().next().unwrap())
         } else {
-            Err("More than one result for given API Key")
+            anyhow::Result::Err(anyhow::Error::msg("More than one result for given API Key"))
         }
     }
 }
 
 pub trait Jsonify {
-    fn to_json(&self) -> Result<String>;
+    fn to_json(self) -> anyhow::Result<String>;
 }
 
-impl Jsonify for Option<Vec<ApiKeyDto>> {
-    fn to_json(&self) -> Result<String> {
-        serde_json::to_string(&self).map_err(|e| Error::from(e).context("Error while converting to Json"))
-    }
-}
-
-impl Jsonify for Option<ApiKeyDto> {
-    fn to_json(&self) -> Result<String> {
-        serde_json::to_string(&self).map_err(|e| Error::from(e).context("Error while converting to Json"))
+impl<T: Serialize> Jsonify for anyhow::Result<T> {
+    fn to_json(self) -> anyhow::Result<String> {
+        self
+            .and_then(|it| serde_json::to_string(&it).map_err(anyhow::Error::msg))
+            .map_err(anyhow::Error::msg)
     }
 }
