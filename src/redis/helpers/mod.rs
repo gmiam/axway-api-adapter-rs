@@ -18,8 +18,8 @@ impl RedisExtensions for R2D2Con {
     }
 
     fn safe_set(&mut self, key: &str, to_cache: &str, ttl: usize) -> Result<()> {
-        self.set::<&str, &str, String>(key, &to_cache)?;
-        self.expire::<&str, usize>("all", ttl)?;
+        self.set::<&str, &str, String>(key, to_cache)?;
+        self.expire::<&str, usize>(key, ttl)?;
         Ok(())
     }
 }
