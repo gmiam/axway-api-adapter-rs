@@ -12,3 +12,33 @@ impl StringExtensions for String {
         content
     }
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_remove_quotes() {
+        let to_test = vec![
+            r#""foo""#.to_string(),
+            r#""""#.to_string(),
+            r#""foooooooooooooooooo""#.to_string(),
+            r#""foo"#.to_string(),
+            r#"foo""#.to_string(),
+            r#""foo"bar""#.to_string(),
+            r#""foo"bar"#.to_string(),
+        ];
+        let expected = vec![
+            "foo",
+            "",
+            "foooooooooooooooooo",
+            "\"foo",
+            "foo\"",
+            "foo\"bar",
+            "\"foo\"bar",
+        ];
+        to_test.into_iter().enumerate()
+            .for_each(|(key,value)| assert_eq!(&value.remove_quotes(), expected.get(key).unwrap()))
+    }
+}
