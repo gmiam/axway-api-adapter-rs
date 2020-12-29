@@ -1,3 +1,4 @@
+use actix_web::HttpResponse;
 use actix_web::{Responder, web::Data};
 
 use crate::{
@@ -27,7 +28,7 @@ impl AppIdService {
         if let Ok(response) = Self::maybe_from_cache(&state, Self::FIND_ALL_KEY) {
             response.ok_200()
         } else {
-            AppIdRepository::find_all(&state.cassandra_pool).await
+        AppIdRepository::find_all(&state.cassandra_pool).await
                 .to_json()
                 .then_cache(state, Self::FIND_ALL_KEY).await
         }

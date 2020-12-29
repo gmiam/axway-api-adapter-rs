@@ -2,9 +2,10 @@ extern crate cdrs;
 #[macro_use]
 extern crate cdrs_helpers_derive;
 
-use actix_web::{App, HttpServer};
 
+use actix_web::{App, HttpServer, middleware::Logger};
 use crate::cassandra::{CassandraPool, create_cassandra_pool};
+use env_logger::Env;
 use crate::redis::connection_pool::{create_redis_pool, RedisPool};
 use crate::resource::api_key;
 
@@ -29,6 +30,8 @@ async fn main() -> std::io::Result<()> {
     //      - Make (better) unit tests
     //      - benchmarks (especially testing number of sessions and keepalive)
 
+    env_logger::from_env(Env::default().default_filter_or("info")).init();
+
     let cassandra_pool = create_cassandra_pool();
     let redis_pool = create_redis_pool();
 
@@ -39,12 +42,13 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
+            .wrap(Logger::default())
             .data(state.clone())
             .service(api_key::find_by_api_key)
             .service(api_key::find_all)
     })
         .keep_alive(75)
-        .bind("127.0.0.1:8280")?
+        .bind("0.0.0.0:8280")?
         .run()
         .await
 }
