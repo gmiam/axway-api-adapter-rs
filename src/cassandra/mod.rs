@@ -1,3 +1,4 @@
+use std::env;
 use std::sync::Arc;
 
 use cdrs::authenticators::NoneAuthenticator;
@@ -6,6 +7,7 @@ use cdrs::cluster::session::{new as new_session, Session};
 use cdrs::load_balancing::RoundRobin;
 use cdrs::query::QueryExecutor;
 use cdrs::types::prelude::Row;
+use dotenv::dotenv;
 
 pub mod api_key;
 
@@ -19,8 +21,14 @@ fn exec_request(session: &CassandraPool, cql_command: &str) -> anyhow::Result<Ve
 }
 
 pub fn create_cassandra_pool() -> CassandraPool {
+    dotenv().ok();
+    let cassandra_host = env::var("CASSANDRA_HOST").unwrap();
+    let cassandra_port = env::var("CASSANDRA_PORT").unwrap();
+
     let auth = NoneAuthenticator;
-    let node = NodeTcpConfigBuilder::new("localhost:9042", auth).build();
+    let connection_string = format!("{}:{}", cassandra_host, cassandra_port);
+    println!("here is the connection string {}", connection_string);
+    let node = NodeTcpConfigBuilder::new(&connection_string, auth).build();
     let cluster_config = ClusterTcpConfig(vec![node]);
     Arc::new(new_session(&cluster_config, RoundRobin::new()).expect("session should be created"))
 }

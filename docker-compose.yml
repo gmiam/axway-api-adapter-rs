@@ -1,0 +1,38 @@
+version: '3.7'
+services:
+    axway-api-adapter:
+        build:
+            context: ./
+            dockerfile: Dockerfile
+        container_name: axway-api-adapter
+        environment:
+          - REDIS_HOST=192.168.0.29
+          - REDIS_PORT=6379
+          - CASSANDRA_HOST=192.168.0.29
+          - CASSANDRA_PORT=9042
+        ports:
+            - 8280:8280
+        depends_on:
+          - redis
+          - cassandra
+    redis:
+        image: redis:6.0.9
+        container_name: redis
+        ports:
+          - 6379:6379
+        volumes:
+          - ./local/redis-data:/var/lib/redis
+    cassandra:
+        image: cassandra:4.0
+        container_name: cassandra
+        # environment:
+        #     - CASSANDRA_SEEDS=cassandra
+        #     - CASSANDRA_CLUSTER_NAME=ApiKeys
+        #     - CASSANDRA_DC=Test
+        #     - CASSANDRA_RACK=West
+        #     - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+        #     - CASSANDRA_NUM_TOKENS=128
+        ports:
+            - 9042:9042
+        volumes:
+            - ./local/cassandra-data:/var/lib/cassandra
